@@ -1,0 +1,25 @@
+plugins {
+    id "com.qixalite.spongestart" version "1.6.0"
+    id 'java'
+}
+
+group 'me.dags'
+version '0.1-SNAPSHOT'
+def spongeAPI = '5.2.0'
+def spongeChannel = 'SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://repo.spongepowered.org/maven'
+    }
+}
+
+dependencies {
+    compileOnly "org.spongepowered:spongeapi:${spongeAPI}-${spongeChannel}"
+}
+
+spongestart {
+    eula true
+    spongeVanillaVersion "1.10.2-5.2.0-BETA-384"
+}
