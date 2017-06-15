@@ -25,11 +25,11 @@ public final class PagFormatter {
 
     PagFormatter(Format format) {
         this.format = format;
-        line = format.start();
-        title = format.start();
-        header = format.start();
-        footer = format.start();
-        padding = format.start();
+        line = format.fmt();
+        title = format.fmt();
+        header = format.fmt();
+        footer = format.fmt();
+        padding = format.fmt();
     }
 
     public Formatter line() {
@@ -86,7 +86,7 @@ public final class PagFormatter {
     private void flush() {
         if (!line.isEmpty()) {
             lines.add(line.build());
-            line = format.start();
+            line = format.fmt();
         }
     }
 

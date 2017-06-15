@@ -21,7 +21,7 @@ public final class Format {
         this.warn = builder.warn;
     }
 
-    public Formatter start() {
+    public Formatter fmt() {
         return new Formatter(this);
     }
 

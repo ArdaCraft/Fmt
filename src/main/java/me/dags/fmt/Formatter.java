@@ -75,7 +75,7 @@ public final class Formatter implements TextRepresentable {
                 .build();
     }
     
-    public Formatter sub() {
+    public Formatter subtitle() {
         return new Formatter(this, format);
     }
 

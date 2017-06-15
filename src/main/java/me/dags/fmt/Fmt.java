@@ -37,11 +37,11 @@ public final class Fmt {
 
     private Fmt() {}
 
-    public static Format id(String id) {
-        return id(id, fmt);
+    public static Format get(String id) {
+        return get(id, fmt);
     }
 
-    public static Format id(String id, Format defaultFormat) {
+    public static Format get(String id, Format defaultFormat) {
         Format format = formats.get(id);
         if (format == null) {
             format = read(id);
@@ -54,24 +54,32 @@ public final class Fmt {
         return format;
     }
 
+    public static Formatter fmt() {
+        return fmt.fmt();
+    }
+
+    public static Format copy() {
+        return fmt.copy();
+    }
+
     public static Formatter info(Object input, Object... args) {
-        return new Formatter(fmt).info(input, args);
+        return fmt().info(input, args);
     }
 
     public static Formatter subdued(Object input, Object... args) {
-        return new Formatter(fmt).subdued(input, args);
+        return fmt().subdued(input, args);
     }
 
     public static Formatter stress(Object input, Object... args) {
-        return new Formatter(fmt).stress(input, args);
+        return fmt().stress(input, args);
     }
 
     public static Formatter error(Object input, Object... args) {
-        return new Formatter(fmt).error(input, args);
+        return fmt().error(input, args);
     }
 
     public static Formatter warn(Object input, Object... args) {
-        return new Formatter(fmt).warn(input, args);
+        return fmt().warn(input, args);
     }
 
     private static Format read(String identifier) {
