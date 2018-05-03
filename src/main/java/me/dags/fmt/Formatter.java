@@ -1,5 +1,7 @@
 package me.dags.fmt;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -84,6 +86,27 @@ public final class Formatter implements TextRepresentable {
             append(Text.NEW_LINE);
         }
         return this;
+    }
+
+    public Formatter command(String pattern, Object... args) {
+        return action(TextActions.runCommand(String.format(pattern, args)));
+    }
+
+    public Formatter suggest(String pattern, Object... args) {
+        return action(TextActions.suggestCommand(String.format(pattern, args)));
+    }
+
+    public Formatter insert(String pattern, Object... args) {
+        return action(TextActions.insertText(String.format(pattern, args)));
+    }
+
+    public Formatter url(String url) {
+        try {
+            return action(TextActions.openUrl(new URL(url)));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return this;
+        }
     }
 
     public Formatter action(TextAction action) {
