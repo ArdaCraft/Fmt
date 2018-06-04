@@ -1,13 +1,16 @@
 package me.dags.fmt;
 
 import com.google.common.reflect.TypeToken;
+import java.util.function.Function;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.format.*;
-
-import java.util.function.Function;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextFormat;
+import org.spongepowered.api.text.format.TextStyle;
+import org.spongepowered.api.text.format.TextStyles;
 
 /**
  * @author dags <dags@dags.me>

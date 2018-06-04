@@ -1,6 +1,11 @@
 package me.dags.fmt;
 
-import org.spongepowered.api.text.format.*;
+import java.util.function.BiConsumer;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextFormat;
+import org.spongepowered.api.text.format.TextStyle;
+import org.spongepowered.api.text.format.TextStyles;
 
 /**
  * @author dags <dags@dags.me>
@@ -49,6 +54,26 @@ public final class Format {
         return new Formatter(this).warn(input, args);
     }
 
+    public <T> Formatter info(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return new Formatter(this).info(input, separator, consumer);
+    }
+
+    public <T> Formatter subdued(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return new Formatter(this).subdued(input, separator, consumer);
+    }
+
+    public <T> Formatter stress(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return new Formatter(this).stress(input, separator, consumer);
+    }
+
+    public <T> Formatter error(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return new Formatter(this).error(input, separator, consumer);
+    }
+
+    public <T> Formatter warn(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return new Formatter(this).warn(input, separator, consumer);
+    }
+
     public Format copy() {
         return toBuilder().build();
     }
@@ -80,8 +105,8 @@ public final class Format {
     public static class Builder {
 
         TextFormat info = TextFormat.of(TextColors.WHITE);
-        TextFormat subdued = TextFormat.of(TextStyles.ITALIC);
-        TextFormat stress = TextFormat.of(TextColors.GREEN);
+        TextFormat subdued = TextFormat.of(TextColors.YELLOW, TextStyles.ITALIC);
+        TextFormat stress = TextFormat.of(TextColors.DARK_AQUA);
         TextFormat error = TextFormat.of(TextColors.GRAY);
         TextFormat warn = TextFormat.of(TextColors.RED);
 

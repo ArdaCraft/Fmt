@@ -1,12 +1,11 @@
 package me.dags.fmt;
 
-import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.text.Text;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import org.spongepowered.api.service.pagination.PaginationList;
+import org.spongepowered.api.text.Text;
 
 /**
  * @author dags <dags@dags.me>

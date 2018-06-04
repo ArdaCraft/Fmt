@@ -2,18 +2,27 @@ package me.dags.fmt;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.Tamer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.action.*;
+import org.spongepowered.api.text.action.ClickAction;
+import org.spongepowered.api.text.action.HoverAction;
+import org.spongepowered.api.text.action.ShiftClickAction;
+import org.spongepowered.api.text.action.TextAction;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.channel.ChatTypeMessageReceiver;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.text.title.Title;
-
-import javax.annotation.Nullable;
+import org.spongepowered.api.world.World;
 
 /**
  * @author dags <dags@dags.me>
@@ -56,7 +65,7 @@ public final class Formatter implements TextRepresentable {
     public Title title() {
         return title(null, null, null);
     }
-    
+
     public Title title(int transition) {
         return title(transition, transition, transition);
     }
@@ -76,7 +85,7 @@ public final class Formatter implements TextRepresentable {
                 .stay(stay)
                 .build();
     }
-    
+
     public Formatter subtitle() {
         return new Formatter(this, format);
     }
@@ -89,15 +98,15 @@ public final class Formatter implements TextRepresentable {
     }
 
     public Formatter command(String pattern, Object... args) {
-        return action(TextActions.runCommand(String.format(pattern, args)));
+        return action(TextActions.runCommand(String.format(pattern, namedArgs(args))));
     }
 
     public Formatter suggest(String pattern, Object... args) {
-        return action(TextActions.suggestCommand(String.format(pattern, args)));
+        return action(TextActions.suggestCommand(String.format(pattern, namedArgs(args))));
     }
 
     public Formatter insert(String pattern, Object... args) {
-        return action(TextActions.insertText(String.format(pattern, args)));
+        return action(TextActions.insertText(String.format(pattern, namedArgs(args))));
     }
 
     public Formatter url(String url) {
@@ -123,6 +132,17 @@ public final class Formatter implements TextRepresentable {
         return this;
     }
 
+    public <T> Formatter list(Iterable<T> iterable, Consumer<Formatter> separator, BiConsumer<Formatter, T> consumer) {
+        Iterator<T> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            consumer.accept(this, iterator.next());
+            if (iterator.hasNext()) {
+                separator.accept(this);
+            }
+        }
+        return this;
+    }
+
     public Formatter append(Text text) {
         empty = false;
         builder.append(text);
@@ -133,24 +153,48 @@ public final class Formatter implements TextRepresentable {
         return append(apply(format.info, input, args));
     }
 
+    public <T> Formatter info(Iterable<T> iterable, String separator, BiConsumer<Formatter, T> consumer) {
+        return list(iterable, f -> f.info(separator), consumer);
+    }
+
     public Formatter subdued(Object input, Object... args) {
         return append(apply(format.subdued, input, args));
+    }
+
+    public <T> Formatter subdued(Iterable<T> iterable, String separator, BiConsumer<Formatter, T> consumer) {
+        return list(iterable, f -> f.subdued(separator), consumer);
     }
 
     public Formatter stress(Object input, Object... args) {
         return append(apply(format.stress, input, args));
     }
 
+    public <T> Formatter stress(Iterable<T> iterable, String separator, BiConsumer<Formatter, T> consumer) {
+        return list(iterable, f -> f.stress(separator), consumer);
+    }
+
     public Formatter error(Object input, Object... args) {
         return append(apply(format.error, input, args));
+    }
+
+    public <T> Formatter error(Iterable<T> iterable, String separator, BiConsumer<Formatter, T> consumer) {
+        return list(iterable, f -> f.error(separator), consumer);
     }
 
     public Formatter warn(Object input, Object... args) {
         return append(apply(format.warn, input, args));
     }
 
+    public <T> Formatter warn(Iterable<T> iterable, String separator, BiConsumer<Formatter, T> consumer) {
+        return list(iterable, f -> f.warn(separator), consumer);
+    }
+
     public Formatter log() {
         return tell(Sponge.getServer().getConsole());
+    }
+
+    public Formatter broadcast() {
+        return tell(Sponge.getServer().getBroadcastChannel());
     }
 
     public Formatter tell(MessageReceiver receiver) {
@@ -182,9 +226,9 @@ public final class Formatter implements TextRepresentable {
         return this;
     }
 
-    public Formatter tell(ChatType chatType, Player... receivers) {
+    public Formatter tell(ChatType chatType, ChatTypeMessageReceiver... receivers) {
         Text message = build();
-        for (Player receiver : receivers) {
+        for (ChatTypeMessageReceiver receiver : receivers) {
             receiver.sendMessage(chatType, message);
         }
         return this;
@@ -228,11 +272,29 @@ public final class Formatter implements TextRepresentable {
             return representable.toText().toBuilder().format(format).build();
         }
 
-        if (args.length > 0) {
-            String string = String.format(text.toString(), args);
+        if (text instanceof String && args.length > 0) {
+            String string = String.format(text.toString(), namedArgs(args));
             return Text.builder(string).format(format).build();
         }
 
+        text = namedObject(text);
+
         return Text.builder(text.toString()).format(format).build();
+    }
+
+    private static Object[] namedArgs(Object[] args) {
+        for (int i = 0; i < args.length; i++) {
+            args[i] = namedObject(args[i]);
+        }
+        return args;
+    }
+
+    private static Object namedObject(Object o) {
+        if (o instanceof Tamer) {
+            return ((Tamer) o).getName();
+        } else if (o instanceof World) {
+            return ((World) o).getName();
+        }
+        return o;
     }
 }

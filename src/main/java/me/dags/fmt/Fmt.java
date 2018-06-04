@@ -2,17 +2,20 @@ package me.dags.fmt;
 
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.spongepowered.api.Sponge;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.plugin.PluginContainer;
 
 /**
  * @author dags <dags@dags.me>
@@ -55,6 +58,12 @@ public final class Fmt {
     }
 
     public static Formatter fmt() {
+        if (Sponge.getServer().isMainThread()) {
+            Optional<PluginContainer> plugin = Sponge.getCauseStackManager().getCurrentContext().get(EventContextKeys.PLUGIN);
+            if (plugin.isPresent()) {
+                return get(plugin.get().getId()).fmt();
+            }
+        }
         return fmt.fmt();
     }
 
@@ -80,6 +89,26 @@ public final class Fmt {
 
     public static Formatter warn(Object input, Object... args) {
         return fmt().warn(input, args);
+    }
+
+    public static <T> Formatter info(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return fmt().info(input, separator, consumer);
+    }
+
+    public static <T> Formatter subdued(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return fmt().subdued(input, separator, consumer);
+    }
+
+    public static <T> Formatter stress(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return fmt().stress(input, separator, consumer);
+    }
+
+    public static <T> Formatter error(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return fmt().error(input, separator, consumer);
+    }
+
+    public static <T> Formatter warn(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
+        return fmt().warn(input, separator, consumer);
     }
 
     private static Format read(String identifier) {
