@@ -59,7 +59,7 @@ public final class Fmt {
 
     public static Formatter fmt() {
         if (Sponge.getServer().isMainThread()) {
-            Optional<PluginContainer> plugin = Sponge.getCauseStackManager().getCurrentContext().get(EventContextKeys.PLUGIN);
+            Optional<PluginContainer> plugin = Sponge.getCauseStackManager().getCurrentCause().last(PluginContainer.class);
             if (plugin.isPresent()) {
                 return get(plugin.get().getId()).fmt();
             }
