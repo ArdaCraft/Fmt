@@ -14,7 +14,6 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.plugin.PluginContainer;
 
 /**
@@ -40,6 +39,16 @@ public final class Fmt {
 
     private Fmt() {}
 
+    public static void init(Format override) {
+        getActivePlugin().ifPresent(plugin -> init(plugin.getId(), override));
+    }
+
+    public static void init(String id, Format override) {
+        if (get(id).equals(fmt) && !override.equals(fmt)) {
+            write(override, id);
+        }
+    }
+
     public static Format get(String id) {
         return get(id, fmt);
     }
@@ -58,13 +67,7 @@ public final class Fmt {
     }
 
     public static Formatter fmt() {
-        if (Sponge.getServer().isMainThread()) {
-            Optional<PluginContainer> plugin = Sponge.getCauseStackManager().getCurrentCause().last(PluginContainer.class);
-            if (plugin.isPresent()) {
-                return get(plugin.get().getId()).fmt();
-            }
-        }
-        return fmt.fmt();
+        return getActivePlugin().map(PluginContainer::getId).map(Fmt::get).orElse(fmt).fmt();
     }
 
     public static Format copy() {
@@ -109,6 +112,13 @@ public final class Fmt {
 
     public static <T> Formatter warn(Iterable<T> input, String separator, BiConsumer<Formatter, T> consumer) {
         return fmt().warn(input, separator, consumer);
+    }
+
+    private static Optional<PluginContainer> getActivePlugin() {
+        if (!Sponge.getServer().isMainThread()) {
+            return Optional.empty();
+        }
+        return Sponge.getCauseStackManager().getCurrentCause().last(PluginContainer.class);
     }
 
     private static Format read(String identifier) {

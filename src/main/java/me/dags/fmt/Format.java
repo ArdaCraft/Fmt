@@ -26,6 +26,22 @@ public final class Format {
         this.warn = builder.warn;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof Format)) {
+            return false;
+        }
+        Format other = (Format) o;
+        return info.equals(other.info)
+                && subdued.equals(other.subdued)
+                && stress.equals(other.stress)
+                && error.equals(other.error)
+                && warn.equals(other.warn);
+    }
+
     public Formatter fmt() {
         return new Formatter(this);
     }

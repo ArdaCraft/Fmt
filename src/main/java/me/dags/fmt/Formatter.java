@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Tamer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -292,8 +294,15 @@ public final class Formatter implements TextRepresentable {
     private static Object namedObject(Object o) {
         if (o instanceof Tamer) {
             return ((Tamer) o).getName();
-        } else if (o instanceof World) {
+        }
+        if (o instanceof CommandSource) {
+            return ((CommandSource) o).getName();
+        }
+        if (o instanceof World) {
             return ((World) o).getName();
+        }
+        if (o instanceof CatalogType) {
+            return ((CatalogType) o).getName();
         }
         return o;
     }
