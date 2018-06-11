@@ -15,6 +15,9 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextFormat;
+import org.spongepowered.api.text.format.TextStyle;
 
 /**
  * @author dags <dags@dags.me>
@@ -67,7 +70,26 @@ public final class Fmt {
     }
 
     public static Formatter fmt() {
-        return getActivePlugin().map(PluginContainer::getId).map(Fmt::get).orElse(fmt).fmt();
+        Optional<PluginContainer> container = getActivePlugin();
+        if (!container.isPresent()) {
+            return fmt.fmt();
+        }
+
+        String id = container.get().getId();
+        Format format = formats.get(id);
+        if (format != null) {
+            return format.fmt();
+        }
+
+        Object plugin = container.get().getInstance().orElse(null);
+        if (plugin == null) {
+            return fmt.fmt();
+        }
+
+        format = process(plugin.getClass());
+        formats.put(id, format);
+        write(format, id);
+        return format.fmt();
     }
 
     public static Format copy() {
@@ -150,5 +172,37 @@ public final class Fmt {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static Format process(Class<?> type) {
+        FmtConfig conf = type.getAnnotation(FmtConfig.class);
+        if (conf == null) {
+            return Format.builder().build();
+        }
+
+        return Format.builder()
+                .info(getFormat(conf.info()))
+                .subdued(getFormat(conf.subdued()))
+                .stress(getFormat(conf.stress()))
+                .error(getFormat(conf.error()))
+                .warn(getFormat(conf.warn()))
+                .build();
+    }
+
+    private static TextFormat getFormat(String[] names) {
+        TextFormat format = TextFormat.NONE;
+        for (String name : names) {
+            Optional<TextColor> color = Sponge.getRegistry().getType(TextColor.class, name);
+            if (color.isPresent()) {
+                format = format.color(color.get());
+                continue;
+            }
+
+            Optional<TextStyle.Base> style = Sponge.getRegistry().getType(TextStyle.Base.class, name);
+            if (style.isPresent()) {
+                format = format.style(style.get());
+            }
+        }
+        return format;
     }
 }
