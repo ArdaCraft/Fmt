@@ -2,10 +2,11 @@ package me.dags.fmt;
 
 import com.google.common.reflect.TypeToken;
 import java.util.function.Function;
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
@@ -37,36 +38,37 @@ final class Serializer implements TypeSerializer<Format> {
 
     static Format deserialize(ConfigurationNode value) {
         Format.Builder builder = Format.builder();
-        builder.info(getFormat(value.getNode(INFO)));
-        builder.subdued(getFormat(value.getNode(SUBDUED)));
-        builder.stress(getFormat(value.getNode(STRESS)));
-        builder.error(getFormat(value.getNode(ERROR)));
-        builder.warn(getFormat(value.getNode(WARN)));
+        builder.info(getFormat(value.node(INFO)));
+        builder.subdued(getFormat(value.node(SUBDUED)));
+        builder.stress(getFormat(value.node(STRESS)));
+        builder.error(getFormat(value.node(ERROR)));
+        builder.warn(getFormat(value.node(WARN)));
         return builder.build();
     }
 
     static void serialize(Format format, ConfigurationNode value) {
-        setFormat(format.info, value.getNode(INFO));
-        setFormat(format.subdued, value.getNode(SUBDUED));
-        setFormat(format.stress, value.getNode(STRESS));
-        setFormat(format.error, value.getNode(ERROR));
-        setFormat(format.warn, value.getNode(WARN));
+        setFormat(format.info, value.node(INFO));
+        setFormat(format.subdued, value.node(SUBDUED));
+        setFormat(format.stress, value.node(STRESS));
+        setFormat(format.error, value.node(ERROR));
+        setFormat(format.warn, value.node(WARN));
     }
 
     private static TextFormat getFormat(ConfigurationNode node) {
-        if (node.isVirtual()) {
+        if (node.virtual()) {
             return TextFormat.NONE;
         }
 
-        String colorId = node.getNode("color").getString("");
-        TextColor color = Sponge.getRegistry().getType(TextColor.class, colorId).orElse(null);
+        String colorId = node.node("color").getString("");
+        //TODO check if adventureRegistry is what we want here.
+        TextColor color = Sponge.registry().adventureRegistry(TextColor.class, colorId).orElse(null);
 
         TextStyle style = TextStyles.of();
-        style = applyNonNull(style, style::bold, (Boolean) node.getNode("bold").getValue((Object) null));
-        style = applyNonNull(style, style::italic, (Boolean) node.getNode("italic").getValue((Object) null));
-        style = applyNonNull(style, style::underline, (Boolean) node.getNode("underline").getValue((Object) null));
-        style = applyNonNull(style, style::obfuscated, (Boolean) node.getNode("obfuscated").getValue((Object) null));
-        style = applyNonNull(style, style::strikethrough, (Boolean) node.getNode("strikethrough").getValue((Object) null));
+        style = applyNonNull(style, style::bold, (Boolean) node.node("bold").((Object) null));
+        style = applyNonNull(style, style::italic, (Boolean) node.node("italic").getValue((Object) null));
+        style = applyNonNull(style, style::underline, (Boolean) node.node("underline").getValue((Object) null));
+        style = applyNonNull(style, style::obfuscated, (Boolean) node.node("obfuscated").getValue((Object) null));
+        style = applyNonNull(style, style::strikethrough, (Boolean) node.node("strikethrough").getValue((Object) null));
 
         TextFormat format = TextFormat.of(style);
         return applyNonNull(format, format::color, color);

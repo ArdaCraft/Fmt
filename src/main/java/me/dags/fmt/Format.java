@@ -7,6 +7,12 @@ import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
 
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextFormat;
+import net.kyori.adventure.text.format.Style;
+
+
 /**
  * @author dags <dags@dags.me>
  */
@@ -120,11 +126,11 @@ public final class Format {
 
     public static class Builder {
 
-        TextFormat info = TextFormat.of(TextColors.WHITE);
-        TextFormat subdued = TextFormat.of(TextColors.YELLOW, TextStyles.ITALIC);
-        TextFormat stress = TextFormat.of(TextColors.DARK_AQUA);
-        TextFormat error = TextFormat.of(TextColors.GRAY);
-        TextFormat warn = TextFormat.of(TextColors.RED);
+        TextFormat info = TextFormat.of(NamedTextColor.WHITE);
+        TextFormat subdued = TextFormat.of(NamedTextColor.YELLOW, Style.ITALIC);
+        TextFormat stress = TextFormat.of(NamedTextColor.DARK_AQUA);
+        TextFormat error = TextFormat.of(NamedTextColor.GRAY);
+        TextFormat warn = TextFormat.of(NamedTextColor.RED);
 
         public Builder info(TextFormat format) {
             this.info = format;

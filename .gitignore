@@ -12,6 +12,9 @@
 
 .idea/
 
+# Gradle
+.gradle
+
 # Package Files #
 *.war
 *.ear

@@ -4,8 +4,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.text.Text;
+
 
 /**
  * @author dags <dags@dags.me>
@@ -17,7 +19,7 @@ public final class PagFormatter {
     private final Formatter header;
     private final Formatter footer;
     private final Formatter padding;
-    private final List<Text> lines = new LinkedList<>();
+    private final List<Component> lines = new LinkedList<>();
 
     private Formatter line;
     private int linesPerPage = 10;
